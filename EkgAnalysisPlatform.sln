@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EkgAnalysisPlatform.Web", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EkgAnalysisPlatform.Tests", "EkgAnalysisPlatform.Tests\EkgAnalysisPlatform.Tests.csproj", "{C9A3BF94-92B1-42DA-BD24-8438D027D2A3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EkgAnalysisPlatform.Functions", "EkgAnalysisPlatform.Functions", "{86D151AE-914A-9F45-0ED6-24DA3B15C686}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EkgAnalysisPlatform_Functions", "EkgAnalysisPlatform.Functions\EkgAnalysisPlatform_Functions.csproj", "{764DCD7D-3271-48ED-AEC7-2804B8184DB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,8 +87,23 @@ Global
 		{C9A3BF94-92B1-42DA-BD24-8438D027D2A3}.Release|x64.Build.0 = Release|Any CPU
 		{C9A3BF94-92B1-42DA-BD24-8438D027D2A3}.Release|x86.ActiveCfg = Release|Any CPU
 		{C9A3BF94-92B1-42DA-BD24-8438D027D2A3}.Release|x86.Build.0 = Release|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Debug|x64.Build.0 = Debug|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Debug|x86.Build.0 = Debug|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Release|x64.ActiveCfg = Release|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Release|x64.Build.0 = Release|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Release|x86.ActiveCfg = Release|Any CPU
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{764DCD7D-3271-48ED-AEC7-2804B8184DB9} = {86D151AE-914A-9F45-0ED6-24DA3B15C686}
 	EndGlobalSection
 EndGlobal
