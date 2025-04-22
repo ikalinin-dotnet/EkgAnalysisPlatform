@@ -5,3 +5,7 @@ EkgAnalysisPlatform.Core/obj
 EkgAnalysisPlatform.Infrastructure/obj
 EkgAnalysisPlatform.Api/appsettings.Development.json
 EkgAnalysisPlatform.Api/Properties/launchSettings.json
+EkgAnalysisPlatform.Api/bin
+EkgAnalysisPlatform.Core/bin
+EkgAnalysisPlatform.Infrastructure/bin
+EkgAnalysisPlatform.Tests/bin
