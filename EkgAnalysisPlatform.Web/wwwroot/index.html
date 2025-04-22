@@ -1,32 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EkgAnalysisPlatform.Web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>EKG Analysis Platform</title>
     <base href="/" />
+    
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
-    <link rel="icon" type="image/png" href="favicon.png" />
     <link href="EkgAnalysisPlatform.Web.styles.css" rel="stylesheet" />
+    
+    <!-- Performance and SEO Optimizations -->
+    <link rel="preload" href="_framework/blazor.webassembly.js" as="script" />
+    <link rel="preload" href="lib/bootstrap/dist/js/bootstrap.bundle.min.js" as="script" />
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="manifest.json" />
+    
+    <!-- Meta Tags for SEO and Social Sharing -->
+    <meta name="description" content="EKG Signal Analysis Platform - Advanced Medical Signal Processing" />
+    <meta name="keywords" content="EKG, medical, signal processing, healthcare technology" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://your-domain.com/" />
+    <meta property="og:title" content="EKG Analysis Platform" />
+    <meta property="og:description" content="Advanced EKG Signal Analysis and Processing" />
+    <meta property="og:image" content="https://your-domain.com/og-image.png" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://your-domain.com/" />
+    <meta property="twitter:title" content="EKG Analysis Platform" />
+    <meta property="twitter:description" content="Advanced EKG Signal Analysis and Processing" />
+    <meta property="twitter:image" content="https://your-domain.com/twitter-image.png" />
 </head>
-
 <body>
+    <!-- App Loading Container -->
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Initializing EKG Analysis Platform...</p>
+        </div>
     </div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="." class="reload">Reload</a>
-        <span class="dismiss">🗙</span>
+    <!-- Error Handling UI -->
+    <div id="blazor-error-ui" class="alert alert-danger position-fixed bottom-0 end-0 m-3" style="display: none;">
+        <p>An unhandled error has occurred.</p>
+        <a href="" class="btn btn-outline-danger reload">Reload</a>
+        <button class="btn btn-outline-secondary dismiss">Dismiss</button>
     </div>
+
+    <!-- Scripts -->
+    <script src="lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
+    
+    <!-- Optional: Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+    </script>
 </body>
-
 </html>
