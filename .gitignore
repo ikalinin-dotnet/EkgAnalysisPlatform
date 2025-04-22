@@ -1,0 +1,7 @@
+﻿EkgAnalysisPlatform.Tests/obj
+EkgAnalysisPlatform.Web/obj
+EkgAnalysisPlatform.Api/obj
+EkgAnalysisPlatform.Core/obj
+EkgAnalysisPlatform.Infrastructure/obj
+EkgAnalysisPlatform.Api/appsettings.Development.json
+EkgAnalysisPlatform.Api/Properties/launchSettings.json
