@@ -9,3 +9,5 @@ EkgAnalysisPlatform.Api/bin
 EkgAnalysisPlatform.Core/bin
 EkgAnalysisPlatform.Infrastructure/bin
 EkgAnalysisPlatform.Tests/bin
+EkgAnalysisPlatform.Functions/.vscode
+EkgAnalysisPlatform.Functions/Properties/launchSettings.json

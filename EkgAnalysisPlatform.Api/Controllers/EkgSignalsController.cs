@@ -41,6 +41,20 @@ public class EkgSignalsController : ControllerBase
         return Ok(signals);
     }
 
+    [HttpGet("unanalyzed")]
+    public async Task<ActionResult<IEnumerable<int>>> GetUnanalyzedSignals()
+    {
+        try
+        {
+            var signals = await _repository.GetUnanalyzedSignalsAsync();
+            return Ok(signals.Select(s => s.Id).ToArray());
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
     [HttpPost]
     public async Task<ActionResult<int>> Create(EkgSignal signal)
     {

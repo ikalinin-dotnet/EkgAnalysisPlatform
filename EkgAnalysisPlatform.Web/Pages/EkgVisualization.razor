@@ -1,6 +1,8 @@
 @page "/visualization/{SignalId:int}"
+@using EkgAnalysisPlatform.Core.Models
 @using System.Net.Http.Json
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
 
 <h3>EKG Signal Visualization</h3>
 
@@ -64,14 +66,20 @@ else
         await LoadSignalData();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && signal != null)
+        {
+            await RenderEkgChart();
+        }
+    }
+
     private async Task LoadSignalData()
     {
         try
         {
             signal = await Http.GetFromJsonAsync<EkgSignal>($"api/EkgSignals/{SignalId}");
             loading = false;
-            await Task.Delay(100); // Wait for UI render
-            await RenderEkgChart();
         }
         catch (Exception ex)
         {
@@ -84,7 +92,9 @@ else
     {
         try
         {
-            analysisResult = await Http.PostAsJsonAsync<AnalysisResult>($"api/EkgSignals/{SignalId}/analyze", null);
+            var response = await Http.PostAsync($"api/EkgSignals/{SignalId}/analyze", null);
+            response.EnsureSuccessStatusCode();
+            analysisResult = await response.Content.ReadFromJsonAsync<AnalysisResult>();
             StateHasChanged();
         }
         catch (Exception ex)
@@ -95,6 +105,9 @@ else
 
     private async Task RenderEkgChart()
     {
-        await JSRuntime.InvokeVoidAsync("drawEkgChart", "ekgCanvas", signal.DataPoints);
+        if (signal?.DataPoints != null)
+        {
+            await JSRuntime.InvokeVoidAsync("drawEkgChart", "ekgCanvas", signal.DataPoints);
+        }
     }
 }
