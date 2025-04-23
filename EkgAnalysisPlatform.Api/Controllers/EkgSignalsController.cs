@@ -1,10 +1,12 @@
 using EkgAnalysisPlatform.Core.Interfaces;
 using EkgAnalysisPlatform.Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EkgAnalysisPlatform.Api.Controllers;
 
 [ApiController]
+[ApiVersion("1.0")]
 [Route("api/[controller]")]
 public class EkgSignalsController : ControllerBase
 {
@@ -17,7 +19,10 @@ public class EkgSignalsController : ControllerBase
         _analysisService = analysisService;
     }
 
+    [Authorize]
     [HttpGet]
+    [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
+    [ProducesResponseType(typeof(IEnumerable<EkgSignal>), 200)]
     public async Task<ActionResult<IEnumerable<EkgSignal>>> GetAll()
     {
         var signals = await _repository.GetAllAsync();
