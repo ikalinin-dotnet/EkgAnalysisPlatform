@@ -1,0 +1,26 @@
+using System;
+
+namespace EkgAnalysisPlatform.SignalService.Domain.Models
+{
+    public class EkgSignal
+    {
+        public int Id { get; set; }
+        public string PatientCode { get; set; } = string.Empty;  // Using PatientCode instead of PatientId for loose coupling
+        public DateTime RecordedAt { get; set; }
+        public double[] DataPoints { get; set; } = Array.Empty<double>();
+        public double SamplingRate { get; set; } // Hz
+        public string? Notes { get; set; }
+        public string DeviceId { get; set; } = string.Empty; // New field to track which device recorded the signal
+        public string RecordedBy { get; set; } = string.Empty; // New field to track who recorded the signal
+        public bool IsProcessed { get; set; } = false; // New field to track processing status
+    }
+    
+    // Additional metadata class for storing signal properties
+    public class SignalMetadata
+    {
+        public int Id { get; set; }
+        public int SignalId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Value { get; set; } = string.Empty;
+    }
+}

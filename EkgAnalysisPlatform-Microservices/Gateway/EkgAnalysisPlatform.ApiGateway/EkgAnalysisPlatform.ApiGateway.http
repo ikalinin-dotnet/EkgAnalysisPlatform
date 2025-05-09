@@ -1,0 +1,6 @@
+@EkgAnalysisPlatform.ApiGateway_HostAddress = http://localhost:5279
+
+GET {{EkgAnalysisPlatform.ApiGateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

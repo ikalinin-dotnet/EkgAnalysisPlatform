@@ -1,0 +1,6 @@
+@EkgAnalysisPlatform.BatchProcessingService.API_HostAddress = http://localhost:5181
+
+GET {{EkgAnalysisPlatform.BatchProcessingService.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
