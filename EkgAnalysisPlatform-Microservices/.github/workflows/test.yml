@@ -1,0 +1,126 @@
+name: EKG Analysis Platform Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      # Set up RabbitMQ container for integration tests
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --health-cmd "rabbitmqctl status"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --no-restore
+    
+    - name: Run unit tests
+      run: dotnet test --no-build --filter "Category=Unit" --collect:"XPlat Code Coverage" --results-directory ./coverage
+    
+    - name: Run integration tests
+      run: dotnet test --no-build --filter "Category=Integration" --collect:"XPlat Code Coverage" --results-directory ./coverage
+      env:
+        RabbitMQ__HostName: localhost
+    
+    - name: Generate code coverage report
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.2.2
+      with:
+        reports: './coverage/**/coverage.cobertura.xml'
+        targetdir: './coveragereport'
+        reporttypes: 'HtmlInline;Cobertura'
+    
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: Coverage Report
+        path: ./coveragereport
+    
+    - name: Add coverage PR comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        recreate: true
+        path: coveragereport/Cobertura.md
+
+  docker-build:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build and push API Gateway image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Gateway/EkgAnalysisPlatform.ApiGateway/Dockerfile
+        push: false
+        tags: ekg-api-gateway:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Build and push Patient Service image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Services/PatientService/EkgAnalysisPlatform.PatientService.API/Dockerfile
+        push: false
+        tags: ekg-patient-service:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Build and push EKG Signal Service image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Services/EkgSignalService/EkgAnalysisPlatform.EkgSignalService.API/Dockerfile
+        push: false
+        tags: ekg-signal-service:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Build and push Analysis Service image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API/Dockerfile
+        push: false
+        tags: ekg-analysis-service:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Build and push Batch Processing Service image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Services/BatchProcessingService/EkgAnalysisPlatform.BatchProcessingService.API/Dockerfile
+        push: false
+        tags: ekg-batch-processing-service:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
