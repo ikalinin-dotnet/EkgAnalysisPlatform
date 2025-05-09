@@ -1,6 +1,6 @@
 @EkgAnalysisPlatform.AnalysisService.API_HostAddress = http://localhost:5246
 
-GET {{EkgAnalysisPlatform.AnalysisService.API_HostAddress}}/weatherforecast/
+GET http://localhost:5246/weatherforecast/
 Accept: application/json
 
 ###

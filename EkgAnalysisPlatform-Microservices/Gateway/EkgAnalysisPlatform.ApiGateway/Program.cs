@@ -1,4 +1,3 @@
-// In PatientService.API/Program.cs
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
@@ -6,25 +5,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure database
-builder.Services.AddDbContext<PatientDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("PatientConnection")));
-
-builder.Services.AddDbContext<EkgSignalDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("EkgSignalConnection")));
-
-builder.Services.AddDbContext<AnalysisDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("AnalysisConnection")));
-
-// Register repositories
-builder.Services.AddScoped<IPatientRepository, PatientRepository>();
-
-// Register application services
-builder.Services.AddScoped<IPatientService, PatientService>();
+// Configure gateway services
+builder.Services.AddHttpClient();
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 // Add health checks
-builder.Services.AddHealthChecks()
-    .AddDbContextCheck<PatientDbContext>();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -38,6 +25,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.MapReverseProxy();
 app.MapHealthChecks("/health");
 
 app.Run();

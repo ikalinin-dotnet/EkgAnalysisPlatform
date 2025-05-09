@@ -1,41 +1,38 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Add services to the container
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Configure database
+builder.Services.AddDbContext<AnalysisDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("AnalysisDatabase")));
+
+// Register repositories
+builder.Services.AddScoped<IAnalysisResultRepository, AnalysisResultRepository>();
+builder.Services.AddScoped<IAnalysisRequestRepository, AnalysisRequestRepository>();
+builder.Services.AddScoped<IAnalysisAlgorithmConfigRepository, AnalysisAlgorithmConfigRepository>();
+
+// Register application services
+builder.Services.AddScoped<IAnalysisService, AnalysisService>();
+
+// Add health checks
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<AnalysisDbContext>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure middleware pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.UseAuthorization();
+app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
