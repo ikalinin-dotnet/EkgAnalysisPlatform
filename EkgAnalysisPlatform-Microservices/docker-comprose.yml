@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: ekg-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Gateway/EkgAnalysisPlatform.ApiGateway/Dockerfile
+    container_name: ekg-api-gateway
+    ports:
+      - "5279:80"
+      - "7039:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__EkgSignalDatabase=Data Source=/app/data/ekgsignal.db
+      - EventBus__HostName=rabbitmq
+    volumes:
+      - ekgsignal_data:/app/data
+    depends_on:
+      - rabbitmq
+
+  analysis-service:
+    build:
+      context: .
+      dockerfile: Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API/Dockerfile
+    container_name: ekg-analysis-service
+    ports:
+      - "5246:80"
+      - "7080:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__AnalysisDatabase=Data Source=/app/data/analysis.db
+      - EventBus__HostName=rabbitmq
+    volumes:
+      - analysis_data:/app/data
+    depends_on:
+      - rabbitmq
+      - ekg-signal-service
+
+  batch-processing-service:
+    build:
+      context: .
+      dockerfile: Services/BatchProcessingService/EkgAnalysisPlatform.BatchProcessingService.API/Dockerfile
+    container_name: ekg-batch-processing-service
+    ports:
+      - "5181:80"
+      - "7284:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__BatchDatabase=Data Source=/app/data/batch.db
+      - EventBus__HostName=rabbitmq
+    volumes:
+      - batch_data:/app/data
+    depends_on:
+      - rabbitmq
+      - ekg-signal-service
+      - analysis-service
+
+volumes:
+  rabbitmq_data:
+  patient_data:
+  ekgsignal_data:
+  analysis_data:
+  batch_data:
+      - ASPNETCORE_URLS=http://+:80
+      - HealthChecks__Services__0__Name=PatientService
+      - HealthChecks__Services__0__Uri=http://patient-service/health
+      - HealthChecks__Services__1__Name=EkgSignalService
+      - HealthChecks__Services__1__Uri=http://ekg-signal-service/health
+      - HealthChecks__Services__2__Name=AnalysisService
+      - HealthChecks__Services__2__Uri=http://analysis-service/health
+      - HealthChecks__Services__3__Name=BatchProcessingService
+      - HealthChecks__Services__3__Uri=http://batch-processing-service/health
+      - ReverseProxy__Clusters__patients-cluster__Destinations__patients-api__Address=http://patient-service
+      - ReverseProxy__Clusters__signals-cluster__Destinations__signals-api__Address=http://ekg-signal-service
+      - ReverseProxy__Clusters__analysis-cluster__Destinations__analysis-api__Address=http://analysis-service
+  depends_on:
+      - patient-service
+      - ekg-signal-service
+      - analysis-service
+      - batch-processing-service
+
+  patient-service:
+    build:
+      context: .
+      dockerfile: Services/PatientService/EkgAnalysisPlatform.PatientService.API/Dockerfile
+    container_name: ekg-patient-service
+    ports:
+      - "5055:80"
+      - "7211:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__PatientDatabase=Data Source=/app/data/patient.db
+      - EventBus__HostName=rabbitmq
+    volumes:
+      - patient_data:/app/data
+    depends_on:
+      - rabbitmq
+
+  ekg-signal-service:
+    build:
+      context: .
+      dockerfile: Services/EkgSignalService/EkgAnalysisPlatform.EkgSignalService.API/Dockerfile
+    container_name: ekg-signal-service
+    ports:
+      - "5125:80"
+      - "7189:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=

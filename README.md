@@ -1,65 +1,123 @@
-EKG Analysis Platform
-A medical signal processing application for analyzing and visualizing electrocardiogram (EKG) data. Built with .NET 8, this solution demonstrates a modern architecture for handling medical telemetry data.
-Overview
-This platform enables medical professionals to:
+# EKG Analysis Platform - Microservices Architecture
 
-Upload and visualize EKG signal data
-Perform automated analysis for heart rate calculation and arrhythmia detection
-Process signals in batch using background processing
-Store and retrieve patient cardiac data
+This project implements a microservices-based platform for EKG signal analysis using .NET 8.0 and Docker.
 
-Architecture
-The solution follows clean architecture principles with these components:
+## Architecture Overview
 
-EkgAnalysisPlatform.Core: Domain models and business logic
-EkgAnalysisPlatform.Infrastructure: Data access and external services
-EkgAnalysisPlatform.Api: REST API endpoints
-EkgAnalysisPlatform.Web: Blazor WebAssembly UI
-EkgAnalysisPlatform.Functions: Azure Functions for batch processing
-EkgAnalysisPlatform.Tests: Unit tests
+The platform consists of the following microservices:
 
-Technologies Used
+1. **API Gateway**: Entry point for all client requests, handles routing and authentication
+2. **Patient Service**: Manages patient data
+3. **EKG Signal Service**: Processes and stores EKG signal data
+4. **Analysis Service**: Performs analysis on EKG signals, providing diagnostic insights
+5. **Batch Processing Service**: Handles batch processing jobs for large datasets
 
-ASP.NET Core 8
-Entity Framework Core
-Blazor WebAssembly
-Azure Functions
-SQL Server
-xUnit for testing
+## Technology Stack
 
-Features
+- **.NET 8.0**: Core application framework
+- **Entity Framework Core**: ORM for data access
+- **RabbitMQ**: Message broker for inter-service communication
+- **Docker & Docker Compose**: Containerization and orchestration
+- **SQLite**: Lightweight database for each service
 
-Signal Visualization: Interactive charts for EKG data
-Automated Analysis: Heart rate calculation and arrhythmia detection
-Batch Processing: Background analysis using Azure Functions
-RESTful API: Clean interface for data access
+## Getting Started
 
-Getting Started
-Prerequisites
+### Prerequisites
 
-.NET 8 SDK
-SQL Server (LocalDB or higher)
+- Docker & Docker Compose
+- .NET 8.0 SDK (for development)
 
-Installation
+### Running the Application
 
-Clone the repository
-git clone https://github.com/ikalinin-dotnet/EkgAnalysisPlatform.git
-cd EkgAnalysisPlatform
+#### Using Scripts
 
-Restore dependencies
-dotnet restore
+For Windows users:
+```powershell
+.\build-and-run.ps1
+```
 
-Build the solution
-dotnet build
+For Linux/macOS users:
+```bash
+chmod +x build-and-run.sh
+./build-and-run.sh
+```
 
-Run the API
-cd EkgAnalysisPlatform.Api
-dotnet run
+#### Manual Setup
 
-Run the Web app (in a separate terminal)
-cd EkgAnalysisPlatform.Web
-dotnet run
+1. Clone the repository
+2. Place the Dockerfiles in their respective directories:
+   ```
+   Gateway/EkgAnalysisPlatform.ApiGateway/Dockerfile
+   Services/PatientService/EkgAnalysisPlatform.PatientService.API/Dockerfile
+   Services/EkgSignalService/EkgAnalysisPlatform.EkgSignalService.API/Dockerfile
+   Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API/Dockerfile
+   Services/BatchProcessingService/EkgAnalysisPlatform.BatchProcessingService.API/Dockerfile
+   ```
+3. Run the docker-compose command:
+   ```
+   docker-compose build
+   docker-compose up -d
+   ```
 
+## Service Endpoints
 
-Project Status
-This is a portfolio project demonstrating .NET development skills for medical software applications. It showcases architecturally sound practices for handling specialized signal processing requirements.
+- **API Gateway**: http://localhost:5279
+- **Patient Service**: http://localhost:5055
+- **EKG Signal Service**: http://localhost:5125
+- **Analysis Service**: http://localhost:5246
+- **Batch Processing Service**: http://localhost:5181
+- **RabbitMQ Management UI**: http://localhost:15672 (username: guest, password: guest)
+
+## Project Structure
+
+```
+EkgAnalysisPlatform-Microservices/
+├── BuildingBlocks/
+│   ├── Common/
+│   └── EventBus/
+├── Gateway/
+│   └── EkgAnalysisPlatform.ApiGateway/
+├── Services/
+│   ├── PatientService/
+│   │   ├── EkgAnalysisPlatform.PatientService.API/
+│   │   ├── EkgAnalysisPlatform.PatientService.Domain/
+│   │   └── EkgAnalysisPlatform.PatientService.Infrastructure/
+│   ├── EkgSignalService/
+│   │   ├── EkgAnalysisPlatform.EkgSignalService.API/
+│   │   ├── EkgAnalysisPlatform.EkgSignalService.Domain/
+│   │   └── EkgAnalysisPlatform.EkgSignalService.Infrastructure/
+│   ├── AnalysisService/
+│   │   ├── EkgAnalysisPlatform.AnalysisService.API/
+│   │   ├── EkgAnalysisPlatform.AnalysisService.Domain/
+│   │   └── EkgAnalysisPlatform.AnalysisService.Infrastructure/
+│   └── BatchProcessingService/
+│       ├── EkgAnalysisPlatform.BatchProcessingService.API/
+│       ├── EkgAnalysisPlatform.BatchProcessingService.Domain/
+│       └── EkgAnalysisPlatform.BatchProcessingService.Infrastructure/
+└── docker-compose.yml
+```
+
+## Development
+
+Each service follows a clean architecture pattern with three projects:
+- **API**: Controllers, DTOs, and API configuration
+- **Domain**: Domain models, interfaces, and business logic
+- **Infrastructure**: Data access, external service integration
+
+## Communication
+
+Services communicate using:
+1. **Synchronous REST API calls** via the API Gateway
+2. **Asynchronous messaging** using RabbitMQ for event-driven communication
+
+The `IEventBus` interface in the EventBus building block provides a consistent API for publishing and subscribing to integration events.
+
+## Persistence
+
+Each service maintains its own SQLite database:
+- **PatientService**: `patient.db`
+- **EkgSignalService**: `ekgsignal.db`
+- **AnalysisService**: `analysis.db`
+- **BatchProcessingService**: `batch.db`
+
+For production deployments, consider replacing SQLite with more robust database solutions like SQL Server, PostgreSQL, or MongoDB.

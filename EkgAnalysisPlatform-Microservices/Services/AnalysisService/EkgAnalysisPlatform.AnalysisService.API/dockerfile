@@ -1,0 +1,24 @@
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API/EkgAnalysisPlatform.AnalysisService.API.csproj", "Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API/"]
+COPY ["Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.Domain/EkgAnalysisPlatform.AnalysisService.Domain.csproj", "Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.Domain/"]
+COPY ["Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.Infrastructure/EkgAnalysisPlatform.AnalysisService.Infrastructure.csproj", "Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.Infrastructure/"]
+COPY ["BuildingBlocks/EventBus/EkgAnalysisPlatform.BuildingBlocks.EventBus/EkgAnalysisPlatform.BuildingBlocks.EventBus.csproj", "BuildingBlocks/EventBus/EkgAnalysisPlatform.BuildingBlocks.EventBus/"]
+COPY ["BuildingBlocks/Common/EkgAnalysisPlatform.BuildingBlocks.Common/EkgAnalysisPlatform.BuildingBlocks.Common.csproj", "BuildingBlocks/Common/EkgAnalysisPlatform.BuildingBlocks.Common/"]
+RUN dotnet restore "Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API/EkgAnalysisPlatform.AnalysisService.API.csproj"
+COPY . .
+WORKDIR "/src/Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API"
+RUN dotnet build "EkgAnalysisPlatform.AnalysisService.API.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "EkgAnalysisPlatform.AnalysisService.API.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "EkgAnalysisPlatform.AnalysisService.API.dll"]

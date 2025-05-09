@@ -1,3 +1,8 @@
+using EkgAnalysisPlatform.ApiGateway.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using System.Text.Json;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
@@ -5,13 +10,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure HTTP client for health checks
+builder.Services.AddHttpClient("HealthCheck").ConfigureHttpClient(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(5);
+});
+
 // Configure gateway services
 builder.Services.AddHttpClient();
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 // Add health checks
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddMicroserviceHealthChecks(builder.Configuration);
 
 // Add authentication
 builder.Services.AddAuthentication("Bearer")
@@ -34,6 +46,32 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.MapReverseProxy();
-app.MapHealthChecks("/health");
+
+// Configure health check endpoint with detailed response
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        
+        var response = new
+        {
+            Status = report.Status.ToString(),
+            Duration = report.TotalDuration,
+            Services = report.Entries.Select(e => new
+            {
+                Service = e.Key,
+                Status = e.Value.Status.ToString(),
+                Description = e.Value.Description,
+                Duration = e.Value.Duration
+            })
+        };
+        
+        await context.Response.WriteAsync(JsonSerializer.Serialize(response, new JsonSerializerOptions
+        {
+            WriteIndented = true
+        }));
+    }
+});
 
 app.Run();
