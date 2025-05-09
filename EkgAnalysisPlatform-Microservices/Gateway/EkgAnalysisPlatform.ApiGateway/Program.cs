@@ -13,6 +13,14 @@ builder.Services.AddReverseProxy()
 // Add health checks
 builder.Services.AddHealthChecks();
 
+// Add authentication
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = builder.Configuration["IdentitySettings:Authority"];
+        options.Audience = builder.Configuration["IdentitySettings:Audience"];
+    });
+
 var app = builder.Build();
 
 // Configure middleware pipeline
