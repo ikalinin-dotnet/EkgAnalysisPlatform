@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace EkgAnalysisPlatform.BatchProcessingService.Domain.Models
 {
     public class BatchJob

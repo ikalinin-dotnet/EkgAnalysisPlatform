@@ -1,5 +1,3 @@
-using System;
-
 namespace EkgAnalysisPlatform.BatchProcessingService.Domain.Models
 {
     public class BatchJobItem

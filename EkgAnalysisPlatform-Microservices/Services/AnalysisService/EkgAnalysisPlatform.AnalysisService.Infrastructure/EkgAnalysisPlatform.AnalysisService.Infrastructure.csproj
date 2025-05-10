@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EkgAnalysisPlatform.EkgSignalService.Domain\EkgAnalysisPlatform.EkgSignalService.Domain.csproj" />
+    <ProjectReference Include="..\EkgAnalysisPlatform.AnalysisService.Domain\EkgAnalysisPlatform.AnalysisService.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
