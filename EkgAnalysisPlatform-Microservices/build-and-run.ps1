@@ -19,18 +19,14 @@ foreach ($dir in $directories) {
     }
 }
 
-# Copy Dockerfile templates to their correct locations
-Write-Host "Copying Dockerfiles to their correct locations..." -ForegroundColor Green
-Copy-Item -Path "Gateway/EkgAnalysisPlatform.ApiGateway/Dockerfile" -Destination "Gateway/EkgAnalysisPlatform.ApiGateway/" -Force
-Copy-Item -Path "Services/PatientService/EkgAnalysisPlatform.PatientService.API/Dockerfile" -Destination "Services/PatientService/EkgAnalysisPlatform.PatientService.API/" -Force
-Copy-Item -Path "Services/EkgSignalService/EkgAnalysisPlatform.EkgSignalService.API/Dockerfile" -Destination "Services/EkgSignalService/EkgAnalysisPlatform.EkgSignalService.API/" -Force
-Copy-Item -Path "Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API/Dockerfile" -Destination "Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API/" -Force
-Copy-Item -Path "Services/BatchProcessingService/EkgAnalysisPlatform.BatchProcessingService.API/Dockerfile" -Destination "Services/BatchProcessingService/EkgAnalysisPlatform.BatchProcessingService.API/" -Force
+# Copy Dockerfile templates to their correct locations if needed
+Write-Host "Ensuring Dockerfiles are in the correct locations..." -ForegroundColor Green
 
 # Add the missing IIntegrationEventHandler.cs file
 Write-Host "Adding missing IIntegrationEventHandler.cs file..." -ForegroundColor Green
 $integrationEventHandlerPath = "BuildingBlocks/EventBus/IIntegrationEventHandler.cs"
-Set-Content -Path $integrationEventHandlerPath -Value @"
+if (-not (Test-Path $integrationEventHandlerPath)) {
+    Set-Content -Path $integrationEventHandlerPath -Value @"
 namespace EkgAnalysisPlatform.BuildingBlocks.EventBus
 {
     public interface IIntegrationEventHandler<in TIntegrationEvent> : IIntegrationEventHandler
@@ -44,11 +40,12 @@ namespace EkgAnalysisPlatform.BuildingBlocks.EventBus
     }
 }
 "@
+}
 
 # Build and run with Docker Compose
 Write-Host "Building and running with Docker Compose..." -ForegroundColor Green
-docker-compose build
-docker-compose up -d
+docker-compose -f docker-compose.yml build
+docker-compose -f docker-compose.yml up -d
 
 Write-Host "All services are running!" -ForegroundColor Green
 Write-Host "Access the API Gateway at http://localhost:5279" -ForegroundColor Yellow

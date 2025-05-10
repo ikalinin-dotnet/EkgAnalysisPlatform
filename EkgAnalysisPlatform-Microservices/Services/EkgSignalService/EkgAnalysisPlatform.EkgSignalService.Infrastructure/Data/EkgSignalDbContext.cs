@@ -1,7 +1,7 @@
-using EkgAnalysisPlatform.Core.Models;
+using EkgAnalysisPlatform.EkgSignalService.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace EkgAnalysisPlatform.Infrastructure.Data.Contexts
+namespace EkgAnalysisPlatform.EkgSignalService.Infrastructure.Data
 {
     public class EkgSignalDbContext : DbContext
     {
@@ -20,7 +20,7 @@ namespace EkgAnalysisPlatform.Infrastructure.Data.Contexts
                 .HasKey(e => e.Id);
                 
             modelBuilder.Entity<EkgSignal>()
-                .Property(e => e.PatientId)
+                .Property(e => e.PatientCode)
                 .IsRequired();
                 
             modelBuilder.Entity<EkgSignal>()
@@ -41,7 +41,7 @@ namespace EkgAnalysisPlatform.Infrastructure.Data.Contexts
                 
             // Configure indexes
             modelBuilder.Entity<EkgSignal>()
-                .HasIndex(e => e.PatientId);
+                .HasIndex(e => e.PatientCode);
                 
             modelBuilder.Entity<EkgSignal>()
                 .HasIndex(e => e.RecordedAt);

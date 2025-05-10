@@ -1,3 +1,5 @@
+using EkgAnalysisPlatform.EkgSignalService.Domain.Models;
+
 namespace EkgAnalysisPlatform.EkgSignalService.Domain.Repositories
 {
     public interface IEkgSignalRepository

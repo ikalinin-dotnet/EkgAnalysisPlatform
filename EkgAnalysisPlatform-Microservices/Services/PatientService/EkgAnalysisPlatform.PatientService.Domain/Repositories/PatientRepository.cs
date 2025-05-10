@@ -1,5 +1,6 @@
 using EkgAnalysisPlatform.PatientService.Domain.Models;
 using EkgAnalysisPlatform.PatientService.Domain.Repositories;
+using EkgAnalysisPlatform.PatientService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace EkgAnalysisPlatform.PatientService.Infrastructure.Repositories

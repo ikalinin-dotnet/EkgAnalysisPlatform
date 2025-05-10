@@ -1,3 +1,5 @@
+using EkgAnalysisPlatform.PatientService.Domain.Models;
+
 namespace EkgAnalysisPlatform.PatientService.Domain.Repositories
 {
     public interface IPatientRepository

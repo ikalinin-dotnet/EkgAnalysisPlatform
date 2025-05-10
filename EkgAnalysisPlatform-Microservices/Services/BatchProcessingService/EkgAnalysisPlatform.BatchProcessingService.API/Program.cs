@@ -1,3 +1,10 @@
+using EkgAnalysisPlatform.BatchProcessingService.Domain.Repositories;
+using EkgAnalysisPlatform.BatchProcessingService.Infrastructure.Data;
+using EkgAnalysisPlatform.BatchProcessingService.Infrastructure.Repositories;
+using EkgAnalysisPlatform.BuildingBlocks.EventBus;
+using EkgAnalysisPlatform.BuildingBlocks.EventBus.RabbitMQ;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
@@ -14,8 +21,9 @@ builder.Services.AddScoped<IBatchJobRepository, BatchJobRepository>();
 builder.Services.AddScoped<IBatchJobItemRepository, BatchJobItemRepository>();
 builder.Services.AddScoped<IScheduleConfigurationRepository, ScheduleConfigurationRepository>();
 
-// Register application services
-builder.Services.AddScoped<IBatchProcessingService, BatchProcessingService>();
+// Configure RabbitMQ Event Bus
+var eventBusHostName = builder.Configuration["EventBus:HostName"] ?? "localhost";
+builder.Services.AddSingleton<IEventBus>(sp => new RabbitMQEventBus(eventBusHostName));
 
 // Add health checks
 builder.Services.AddHealthChecks()
@@ -34,5 +42,12 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
+
+// Ensure database is created
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<BatchDbContext>();
+    dbContext.Database.EnsureCreated();
+}
 
 app.Run();

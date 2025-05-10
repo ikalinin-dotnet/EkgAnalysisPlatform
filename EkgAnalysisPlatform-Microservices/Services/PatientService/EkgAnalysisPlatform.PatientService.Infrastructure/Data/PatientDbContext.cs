@@ -1,7 +1,7 @@
-using EkgAnalysisPlatform.Core.Models;
+using EkgAnalysisPlatform.PatientService.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace EkgAnalysisPlatform.Infrastructure.Data.Contexts
+namespace EkgAnalysisPlatform.PatientService.Infrastructure.Data
 {
     public class PatientDbContext : DbContext
     {

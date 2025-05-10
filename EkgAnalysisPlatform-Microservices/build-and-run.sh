@@ -10,18 +10,15 @@ mkdir -p Services/EkgSignalService/EkgAnalysisPlatform.EkgSignalService.API
 mkdir -p Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API
 mkdir -p Services/BatchProcessingService/EkgAnalysisPlatform.BatchProcessingService.API
 
-# Move Dockerfiles to correct locations
-echo -e "\e[32mCopying Dockerfiles to their correct locations...\e[0m"
-cp -f Gateway/EkgAnalysisPlatform.ApiGateway/Dockerfile Gateway/EkgAnalysisPlatform.ApiGateway/
-cp -f Services/PatientService/EkgAnalysisPlatform.PatientService.API/Dockerfile Services/PatientService/EkgAnalysisPlatform.PatientService.API/
-cp -f Services/EkgSignalService/EkgAnalysisPlatform.EkgSignalService.API/Dockerfile Services/EkgSignalService/EkgAnalysisPlatform.EkgSignalService.API/
-cp -f Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API/Dockerfile Services/AnalysisService/EkgAnalysisPlatform.AnalysisService.API/
-cp -f Services/BatchProcessingService/EkgAnalysisPlatform.BatchProcessingService.API/Dockerfile Services/BatchProcessingService/EkgAnalysisPlatform.BatchProcessingService.API/
+# Ensure Dockerfiles are in correct locations
+echo -e "\e[32mEnsuring Dockerfiles are in correct locations...\e[0m"
 
 # Add the missing IIntegrationEventHandler.cs file
 echo -e "\e[32mAdding missing IIntegrationEventHandler.cs file...\e[0m"
 INTEGRATION_EVENT_HANDLER_PATH="BuildingBlocks/EventBus/IIntegrationEventHandler.cs"
-cat > "$INTEGRATION_EVENT_HANDLER_PATH" << 'EOF'
+if [ ! -f "$INTEGRATION_EVENT_HANDLER_PATH" ]; then
+    mkdir -p $(dirname "$INTEGRATION_EVENT_HANDLER_PATH")
+    cat > "$INTEGRATION_EVENT_HANDLER_PATH" << 'EOF'
 namespace EkgAnalysisPlatform.BuildingBlocks.EventBus
 {
     public interface IIntegrationEventHandler<in TIntegrationEvent> : IIntegrationEventHandler
@@ -35,11 +32,12 @@ namespace EkgAnalysisPlatform.BuildingBlocks.EventBus
     }
 }
 EOF
+fi
 
 # Build and run with Docker Compose
 echo -e "\e[32mBuilding and running with Docker Compose...\e[0m"
-docker-compose build
-docker-compose up -d
+docker-compose -f docker-compose.yml build
+docker-compose -f docker-compose.yml up -d
 
 echo -e "\e[32mAll services are running!\e[0m"
 echo -e "\e[33mAccess the API Gateway at http://localhost:5279\e[0m"

@@ -1,3 +1,10 @@
+using EkgAnalysisPlatform.BuildingBlocks.EventBus;
+using EkgAnalysisPlatform.BuildingBlocks.EventBus.RabbitMQ;
+using EkgAnalysisPlatform.PatientService.Domain.Repositories;
+using EkgAnalysisPlatform.PatientService.Infrastructure.Data;
+using EkgAnalysisPlatform.PatientService.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
@@ -12,8 +19,9 @@ builder.Services.AddDbContext<PatientDbContext>(options =>
 // Register repositories
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 
-// Register application services
-builder.Services.AddScoped<IPatientService, PatientService>();
+// Configure RabbitMQ Event Bus
+var eventBusHostName = builder.Configuration["EventBus:HostName"] ?? "localhost";
+builder.Services.AddSingleton<IEventBus>(sp => new RabbitMQEventBus(eventBusHostName));
 
 // Add health checks
 builder.Services.AddHealthChecks()
@@ -32,5 +40,12 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
+
+// Ensure database is created
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<PatientDbContext>();
+    dbContext.Database.EnsureCreated();
+}
 
 app.Run();

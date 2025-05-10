@@ -21,6 +21,10 @@ builder.Services.AddHttpClient();
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
+// Configure RabbitMQ Event Bus
+var eventBusHostName = builder.Configuration["EventBus:HostName"] ?? "localhost";
+builder.Services.AddSingleton<IEventBus>(sp => new RabbitMQEventBus(eventBusHostName));
+
 // Add health checks
 builder.Services.AddHealthChecks()
     .AddMicroserviceHealthChecks(builder.Configuration);

@@ -10,7 +10,6 @@ namespace EkgAnalysisPlatform.EkgSignalService.API.DTOs
         public string DeviceId { get; set; } = string.Empty;
         public string RecordedBy { get; set; } = string.Empty;
         public bool IsProcessed { get; set; }
-        // DataPoints will be returned as a summary or URL to retrieve them
         public int DataPointsCount { get; set; }
     }
     

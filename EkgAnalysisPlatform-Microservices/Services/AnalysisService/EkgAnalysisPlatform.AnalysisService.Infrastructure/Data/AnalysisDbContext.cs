@@ -1,7 +1,7 @@
-using EkgAnalysisPlatform.Core.Models;
+using EkgAnalysisPlatform.AnalysisService.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace EkgAnalysisPlatform.Infrastructure.Data.Contexts
+namespace EkgAnalysisPlatform.AnalysisService.Infrastructure.Data
 {
     public class AnalysisDbContext : DbContext
     {
@@ -9,7 +9,9 @@ namespace EkgAnalysisPlatform.Infrastructure.Data.Contexts
         {
         }
         
+        public DbSet<AnalysisRequest> AnalysisRequests { get; set; }
         public DbSet<AnalysisResult> AnalysisResults { get; set; }
+        public DbSet<AnalysisAlgorithmConfig> AlgorithmConfigs { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,7 +22,7 @@ namespace EkgAnalysisPlatform.Infrastructure.Data.Contexts
                 .HasKey(a => a.Id);
                 
             modelBuilder.Entity<AnalysisResult>()
-                .Property(a => a.EkgSignalId)
+                .Property(a => a.SignalReference)
                 .IsRequired();
                 
             modelBuilder.Entity<AnalysisResult>()
@@ -33,13 +35,37 @@ namespace EkgAnalysisPlatform.Infrastructure.Data.Contexts
                 
             // Configure indexes
             modelBuilder.Entity<AnalysisResult>()
-                .HasIndex(a => a.EkgSignalId);
+                .HasIndex(a => a.SignalReference);
                 
             modelBuilder.Entity<AnalysisResult>()
                 .HasIndex(a => a.AnalyzedAt);
                 
             modelBuilder.Entity<AnalysisResult>()
                 .HasIndex(a => a.HasArrhythmia);
+
+            // Configure AnalysisRequest entity
+            modelBuilder.Entity<AnalysisRequest>()
+                .HasKey(a => a.Id);
+
+            modelBuilder.Entity<AnalysisRequest>()
+                .Property(a => a.SignalReference)
+                .IsRequired();
+
+            modelBuilder.Entity<AnalysisRequest>()
+                .Property(a => a.PatientCode)
+                .IsRequired();
+
+            // Configure AlgorithmConfig entity
+            modelBuilder.Entity<AnalysisAlgorithmConfig>()
+                .HasKey(a => a.Id);
+
+            modelBuilder.Entity<AnalysisAlgorithmConfig>()
+                .Property(a => a.AlgorithmName)
+                .IsRequired();
+
+            modelBuilder.Entity<AnalysisAlgorithmConfig>()
+                .Property(a => a.Version)
+                .IsRequired();
         }
     }
 }

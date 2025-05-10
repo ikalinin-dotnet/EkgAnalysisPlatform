@@ -1,14 +1,15 @@
 using EkgAnalysisPlatform.EkgSignalService.Domain.Models;
 using EkgAnalysisPlatform.EkgSignalService.Domain.Repositories;
+using EkgAnalysisPlatform.EkgSignalService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace EkgAnalysisPlatform.EkgSignalService.Infrastructure.Repositories
 {
     public class EkgSignalRepository : IEkgSignalRepository
     {
-        private readonly SignalDbContext _context;
+        private readonly EkgSignalDbContext _context;
 
-        public EkgSignalRepository(SignalDbContext context)
+        public EkgSignalRepository(EkgSignalDbContext context)
         {
             _context = context;
         }
