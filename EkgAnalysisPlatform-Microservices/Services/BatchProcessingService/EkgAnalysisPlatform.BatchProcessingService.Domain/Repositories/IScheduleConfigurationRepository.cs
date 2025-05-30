@@ -1,3 +1,5 @@
+using EkgAnalysisPlatform.BatchProcessingService.Domain.Models;
+
 namespace EkgAnalysisPlatform.BatchProcessingService.Domain.Repositories
 {
     public interface IScheduleConfigurationRepository

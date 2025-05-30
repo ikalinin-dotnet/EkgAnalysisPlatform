@@ -1,3 +1,5 @@
+using EkgAnalysisPlatform.AnalysisService.Domain.Models;
+
 namespace EkgAnalysisPlatform.AnalysisService.Domain.Repositories
 {
     public interface IAnalysisRequestRepository

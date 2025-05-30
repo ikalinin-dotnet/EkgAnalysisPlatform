@@ -1,11 +1,17 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using EkgAnalysisPlatform.PatientService.Domain.Models;
+using EkgAnalysisPlatform.PatientService.Infrastructure.Data;
+using EkgAnalysisPlatform.PatientService.Infrastructure.Repositories;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using Xunit;
+
 namespace EkgAnalysisPlatform.PatientService.Tests.Repositories
 {
     public class PatientRepositoryTests
     {
-        // These tests would interact with a test database or in-memory database
-        // Here's a simplified example using an in-memory database:
-        
-        
         private readonly DbContextOptions<PatientDbContext> _options;
         private readonly PatientDbContext _context;
         private readonly PatientRepository _repository;
@@ -48,7 +54,7 @@ namespace EkgAnalysisPlatform.PatientService.Tests.Repositories
             
             // Assert
             result.Should().NotBeNull();
-            result.PatientCode.Should().Be("P001");
+            result!.PatientCode.Should().Be("P001");
         }
 
         [Fact]

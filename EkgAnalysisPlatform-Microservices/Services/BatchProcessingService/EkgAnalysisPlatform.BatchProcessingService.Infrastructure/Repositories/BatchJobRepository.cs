@@ -1,5 +1,6 @@
 using EkgAnalysisPlatform.BatchProcessingService.Domain.Models;
 using EkgAnalysisPlatform.BatchProcessingService.Domain.Repositories;
+using EkgAnalysisPlatform.BatchProcessingService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace EkgAnalysisPlatform.BatchProcessingService.Infrastructure.Repositories

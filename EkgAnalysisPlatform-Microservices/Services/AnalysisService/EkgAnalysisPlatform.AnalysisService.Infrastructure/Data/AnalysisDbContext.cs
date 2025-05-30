@@ -66,6 +66,14 @@ namespace EkgAnalysisPlatform.AnalysisService.Infrastructure.Data
             modelBuilder.Entity<AnalysisAlgorithmConfig>()
                 .Property(a => a.Version)
                 .IsRequired();
+                
+            // Store Dictionary as JSON
+            modelBuilder.Entity<AnalysisAlgorithmConfig>()
+                .Property(a => a.Parameters)
+                .HasConversion(
+                    v => System.Text.Json.JsonSerializer.Serialize(v, new System.Text.Json.JsonSerializerOptions()),
+                    v => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(v, new System.Text.Json.JsonSerializerOptions()) ?? new Dictionary<string, string>()
+                );
         }
     }
 }

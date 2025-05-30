@@ -1,6 +1,5 @@
 using EkgAnalysisPlatform.ApiGateway.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c => {
+    c.SwaggerDoc("v1", new() { Title = "EKG Analysis Platform API", Version = "v1" });
+});
 
 // Configure HTTP client for health checks
 builder.Services.AddHttpClient("HealthCheck").ConfigureHttpClient(client =>

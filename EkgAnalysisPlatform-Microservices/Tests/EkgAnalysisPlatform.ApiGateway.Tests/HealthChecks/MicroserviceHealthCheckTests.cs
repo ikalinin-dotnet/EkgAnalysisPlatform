@@ -1,3 +1,12 @@
+using System.Net;
+using EkgAnalysisPlatform.ApiGateway.HealthChecks;
+using FluentAssertions;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Moq.Protected;
+using Xunit;
+
 namespace EkgAnalysisPlatform.ApiGateway.Tests.HealthChecks
 {
     public class MicroserviceHealthCheckTests
@@ -14,7 +23,6 @@ namespace EkgAnalysisPlatform.ApiGateway.Tests.HealthChecks
             _loggerMock = new Mock<ILogger<MicroserviceHealthCheck>>();
             _handlerMock = new Mock<HttpMessageHandler>();
             
-            // Setup HTTP client with mocked handler
             _httpClient = new HttpClient(_handlerMock.Object)
             {
                 BaseAddress = new Uri("http://testserver/")
@@ -48,10 +56,10 @@ namespace EkgAnalysisPlatform.ApiGateway.Tests.HealthChecks
                 });
 
             // Act
-            var result = await _healthCheck.CheckHealthAsync(new Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckContext());
+            var result = await _healthCheck.CheckHealthAsync(new HealthCheckContext());
 
             // Assert
-            result.Status.Should().Be(Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Healthy);
+            result.Status.Should().Be(HealthStatus.Healthy);
             result.Description.Should().Be("TestService is healthy.");
         }
 
@@ -72,10 +80,10 @@ namespace EkgAnalysisPlatform.ApiGateway.Tests.HealthChecks
                 });
 
             // Act
-            var result = await _healthCheck.CheckHealthAsync(new Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckContext());
+            var result = await _healthCheck.CheckHealthAsync(new HealthCheckContext());
 
             // Assert
-            result.Status.Should().Be(Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy);
+            result.Status.Should().Be(HealthStatus.Unhealthy);
             result.Description.Should().StartWith("TestService is unhealthy. Status code: InternalServerError");
         }
 
@@ -92,10 +100,10 @@ namespace EkgAnalysisPlatform.ApiGateway.Tests.HealthChecks
                 .ThrowsAsync(new HttpRequestException("Connection refused"));
 
             // Act
-            var result = await _healthCheck.CheckHealthAsync(new Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckContext());
+            var result = await _healthCheck.CheckHealthAsync(new HealthCheckContext());
 
             // Assert
-            result.Status.Should().Be(Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy);
+            result.Status.Should().Be(HealthStatus.Unhealthy);
             result.Description.Should().StartWith("TestService is unhealthy. Error: Connection refused");
         }
     }
