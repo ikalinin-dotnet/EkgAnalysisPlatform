@@ -1,4 +1,6 @@
 using EkgAnalysisPlatform.ApiGateway.HealthChecks;
+using EkgAnalysisPlatform.BuildingBlocks.EventBus;
+using EkgAnalysisPlatform.BuildingBlocks.EventBus.RabbitMQ;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using System.Text.Json;
 
@@ -24,19 +26,25 @@ builder.Services.AddReverseProxy()
 
 // Configure RabbitMQ Event Bus
 var eventBusHostName = builder.Configuration["EventBus:HostName"] ?? "localhost";
-builder.Services.AddSingleton<IEventBus>(sp => new RabbitMQEventBus(eventBusHostName));
+builder.Services.AddSingleton<IEventBus>(sp => 
+{
+    var logger = sp.GetService<ILogger<RabbitMQEventBus>>();
+    return new RabbitMQEventBus(eventBusHostName, sp, logger);
+});
 
 // Add health checks
 builder.Services.AddHealthChecks()
     .AddMicroserviceHealthChecks(builder.Configuration);
 
-// Add authentication
+// Add authentication (optional - uncomment if needed)
+/*
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
         options.Authority = builder.Configuration["IdentitySettings:Authority"];
         options.Audience = builder.Configuration["IdentitySettings:Audience"];
     });
+*/
 
 var app = builder.Build();
 
@@ -48,7 +56,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
+// app.UseAuthorization(); // Uncomment if authentication is enabled
 app.MapControllers();
 app.MapReverseProxy();
 

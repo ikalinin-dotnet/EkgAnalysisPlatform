@@ -1,6 +1,9 @@
 using EkgAnalysisPlatform.AnalysisService.Domain.Repositories;
+using EkgAnalysisPlatform.AnalysisService.Domain.Services;
 using EkgAnalysisPlatform.AnalysisService.Infrastructure.Data;
 using EkgAnalysisPlatform.AnalysisService.Infrastructure.Repositories;
+using EkgAnalysisPlatform.AnalysisService.Infrastructure.Services;
+using EkgAnalysisPlatform.AnalysisService.API.Services;
 using EkgAnalysisPlatform.BuildingBlocks.EventBus;
 using EkgAnalysisPlatform.BuildingBlocks.EventBus.RabbitMQ;
 using Microsoft.EntityFrameworkCore;
@@ -21,9 +24,18 @@ builder.Services.AddScoped<IAnalysisResultRepository, AnalysisResultRepository>(
 builder.Services.AddScoped<IAnalysisRequestRepository, AnalysisRequestRepository>();
 builder.Services.AddScoped<IAnalysisAlgorithmConfigRepository, AnalysisAlgorithmConfigRepository>();
 
+// Register domain services
+builder.Services.AddScoped<IEkgAnalysisEngine, EkgAnalysisEngine>();
+
+// Register background services
+builder.Services.AddHostedService<AnalysisBackgroundService>();
+
 // Configure RabbitMQ Event Bus
 var eventBusHostName = builder.Configuration["EventBus:HostName"] ?? "localhost";
-builder.Services.AddSingleton<IEventBus>(sp => new RabbitMQEventBus(eventBusHostName));
+builder.Services.AddSingleton<IEventBus>(sp => new RabbitMQEventBus(
+    eventBusHostName, 
+    sp, 
+    sp.GetService<ILogger<RabbitMQEventBus>>()));
 
 // Add health checks
 builder.Services.AddHealthChecks()

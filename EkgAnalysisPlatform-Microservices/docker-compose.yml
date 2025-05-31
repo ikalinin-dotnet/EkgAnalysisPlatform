@@ -16,37 +16,6 @@ services:
       timeout: 10s
       retries: 5
 
-  api-gateway:
-    build:
-      context: .
-      dockerfile: Gateway/EkgAnalysisPlatform.ApiGateway/Dockerfile
-    container_name: ekg-api-gateway
-    ports:
-      - "5279:80"
-      - "7039:443"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
-      - HealthChecks__Services__0__Name=PatientService
-      - HealthChecks__Services__0__Uri=http://patient-service/health
-      - HealthChecks__Services__1__Name=EkgSignalService
-      - HealthChecks__Services__1__Uri=http://ekg-signal-service/health
-      - HealthChecks__Services__2__Name=AnalysisService
-      - HealthChecks__Services__2__Uri=http://analysis-service/health
-      - HealthChecks__Services__3__Name=BatchProcessingService
-      - HealthChecks__Services__3__Uri=http://batch-processing-service/health
-      - ReverseProxy__Clusters__patients-cluster__Destinations__patients-api__Address=http://patient-service
-      - ReverseProxy__Clusters__signals-cluster__Destinations__signals-api__Address=http://ekg-signal-service
-      - ReverseProxy__Clusters__analysis-cluster__Destinations__analysis-api__Address=http://analysis-service
-      - ReverseProxy__Clusters__batch-cluster__Destinations__batch-api__Address=http://batch-processing-service
-      - EventBus__HostName=rabbitmq
-    depends_on:
-      - rabbitmq
-      - patient-service
-      - ekg-signal-service
-      - analysis-service
-      - batch-processing-service
-
   patient-service:
     build:
       context: .
@@ -54,7 +23,6 @@ services:
     container_name: ekg-patient-service
     ports:
       - "5055:80"
-      - "7211:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
@@ -63,7 +31,9 @@ services:
     volumes:
       - patient_data:/app/data
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
 
   ekg-signal-service:
     build:
@@ -72,7 +42,6 @@ services:
     container_name: ekg-signal-service
     ports:
       - "5125:80"
-      - "7189:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
@@ -81,7 +50,9 @@ services:
     volumes:
       - ekgsignal_data:/app/data
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
 
   analysis-service:
     build:
@@ -90,7 +61,6 @@ services:
     container_name: ekg-analysis-service
     ports:
       - "5246:80"
-      - "7080:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
@@ -99,8 +69,11 @@ services:
     volumes:
       - analysis_data:/app/data
     depends_on:
-      - rabbitmq
-      - ekg-signal-service
+      rabbitmq:
+        condition: service_healthy
+      ekg-signal-service:
+        condition: service_started
+    restart: unless-stopped
 
   batch-processing-service:
     build:
@@ -109,7 +82,6 @@ services:
     container_name: ekg-batch-processing-service
     ports:
       - "5181:80"
-      - "7284:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
@@ -118,9 +90,37 @@ services:
     volumes:
       - batch_data:/app/data
     depends_on:
-      - rabbitmq
-      - ekg-signal-service
-      - analysis-service
+      rabbitmq:
+        condition: service_healthy
+      ekg-signal-service:
+        condition: service_started
+      analysis-service:
+        condition: service_started
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Gateway/EkgAnalysisPlatform.ApiGateway/Dockerfile
+    container_name: ekg-api-gateway
+    ports:
+      - "5279:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - EventBus__HostName=rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      patient-service:
+        condition: service_started
+      ekg-signal-service:
+        condition: service_started
+      analysis-service:
+        condition: service_started
+      batch-processing-service:
+        condition: service_started
+    restart: unless-stopped
 
 volumes:
   rabbitmq_data:

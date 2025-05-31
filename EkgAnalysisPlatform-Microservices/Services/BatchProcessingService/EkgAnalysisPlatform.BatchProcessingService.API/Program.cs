@@ -1,3 +1,4 @@
+using EkgAnalysisPlatform.BatchProcessingService.API.Services;
 using EkgAnalysisPlatform.BatchProcessingService.Domain.Repositories;
 using EkgAnalysisPlatform.BatchProcessingService.Infrastructure.Data;
 using EkgAnalysisPlatform.BatchProcessingService.Infrastructure.Repositories;
@@ -23,7 +24,14 @@ builder.Services.AddScoped<IScheduleConfigurationRepository, ScheduleConfigurati
 
 // Configure RabbitMQ Event Bus
 var eventBusHostName = builder.Configuration["EventBus:HostName"] ?? "localhost";
-builder.Services.AddSingleton<IEventBus>(sp => new RabbitMQEventBus(eventBusHostName));
+builder.Services.AddSingleton<IEventBus>(sp => 
+{
+    var logger = sp.GetService<ILogger<RabbitMQEventBus>>();
+    return new RabbitMQEventBus(eventBusHostName, sp, logger);
+});
+
+// Register background service
+builder.Services.AddHostedService<BatchProcessingBackgroundService>();
 
 // Add health checks
 builder.Services.AddHealthChecks()

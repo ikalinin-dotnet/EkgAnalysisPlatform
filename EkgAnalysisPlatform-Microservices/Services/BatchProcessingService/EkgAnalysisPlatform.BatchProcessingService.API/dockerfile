@@ -16,9 +16,10 @@ WORKDIR "/src/Services/BatchProcessingService/EkgAnalysisPlatform.BatchProcessin
 RUN dotnet build "EkgAnalysisPlatform.BatchProcessingService.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "EkgAnalysisPlatform.BatchProcessingService.API.csproj" -c Release -o /app/publish
+RUN dotnet publish "EkgAnalysisPlatform.BatchProcessingService.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
+RUN mkdir -p /app/data
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "EkgAnalysisPlatform.BatchProcessingService.API.dll"]

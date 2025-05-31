@@ -10,5 +10,4 @@ namespace EkgAnalysisPlatform.BuildingBlocks.EventBus
             where T : IntegrationEvent 
             where TH : IIntegrationEventHandler<T>;
     }
-
 }
