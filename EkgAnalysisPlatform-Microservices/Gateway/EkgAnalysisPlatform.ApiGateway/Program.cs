@@ -36,7 +36,7 @@ builder.Services.AddSingleton<IEventBus>(sp =>
 builder.Services.AddHealthChecks()
     .AddMicroserviceHealthChecks(builder.Configuration);
 
-// Add authentication (optional - uncomment if needed)
+// Add authentication (optional)
 /*
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
