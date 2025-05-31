@@ -59,7 +59,7 @@ namespace EkgAnalysisPlatform.BuildingBlocks.Tests.EventBus
             using var eventBus = new RabbitMQEventBus("localhost", _connectionFactoryMock.Object);
             
             // Assert
-            _connectionFactoryMock.VerifyGet(cf => cf.HostName, Times.Once);
+            _connectionFactoryMock.Verify(cf => cf.CreateConnection(), Times.Once);
             _connectionMock.Verify(c => c.CreateModel(), Times.Once);
             _channelMock.Verify(ch => ch.ExchangeDeclare(
                 It.Is<string>(s => s == "ekg_event_bus"), 
